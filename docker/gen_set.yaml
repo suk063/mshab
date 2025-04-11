@@ -17,7 +17,7 @@ spec:
         - -c
         - |
           eval "$(conda shell.bash hook)"
-          conda activate /wj-vol/mshab_env
+          conda activate /wj-vol/mshab-gen
           export MS_ASSET_DIR="/wj-vol/mani_skill_assets/data"
           cd /wj-vol/projects/mshab-gen
           bash scripts/gen_set.sh
