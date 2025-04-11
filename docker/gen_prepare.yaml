@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mshab-job3
+spec:
+  template:
+    spec:
+      containers:
+      - name: mshab-job3
+        image: maniskill/base:latest
+        env:
+        - name: WANDB_API_KEY
+          value: "fa0217e1710fa18cb4196c5c0f5d33ee96a85b28"
+        command:
+        - /bin/bash
+        args:
+        - -c
+        - |
+          eval "$(conda shell.bash hook)"
+          conda activate /wj-vol/mshab_env
+          export MS_ASSET_DIR="/wj-vol/mani_skill_assets/data"
+          cd /wj-vol/projects/mshab-gen
+          bash scripts/gen_prepare.sh
+        volumeMounts:
+        - name: wj-vol
+          mountPath: /wj-vol
+        resources:
+          limits:
+            memory: 64G
+            cpu: "16"
+            nvidia.com/gpu: "1"
+          requests:
+            memory: 64G
+            cpu: "16"
+            nvidia.com/gpu: "1"
+      volumes:
+      - name: wj-vol
+        persistentVolumeClaim:
+          claimName: wj-vol
+      restartPolicy: Never
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: nvidia.com/gpu.product
+                operator: In
+                values:
+                - "NVIDIA-GeForce-RTX-4090"
+  backoffLimit: 5
