@@ -28,21 +28,35 @@ class FetchDepthObservationWrapper(gym.ObservationWrapper):
     def observation(self, observation):
         agent_obs = observation["agent"]
         extra_obs = observation["extra"]
-        fetch_head_depth = observation["sensor_data"]["fetch_head"]["depth"].permute(
-            0, 3, 1, 2
-        )
+
         fetch_hand_depth = observation["sensor_data"]["fetch_hand"]["depth"].permute(
             0, 3, 1, 2
         )
+        fetch_hand_rgb = observation["sensor_data"]["fetch_hand"]["rgb"].permute(
+            0, 3, 1, 2
+        )
+        fetch_head_depth = observation["sensor_data"]["fetch_head"]["depth"].permute(
+            0, 3, 1, 2
+        )
+        fetch_head_rgb = observation["sensor_data"]["fetch_head"]["rgb"].permute(
+            0, 3, 1, 2
+        )
+
+        fetch_hand_pose = observation["sensor_param"]["fetch_hand"]["extrinsic_cv"]
+        fetch_head_pose = observation["sensor_param"]["fetch_head"]["extrinsic_cv"]
 
         depth_pixels = (
             dict(
-                all_depth=self._stack_fn([fetch_head_depth, fetch_hand_depth], axis=-3)
+                all_depth=self._stack_fn([fetch_hand_depth, fetch_hand_rgb], axis=-3)
             )
             if self.cat_pixels
             else dict(
-                fetch_head_depth=fetch_head_depth,
                 fetch_hand_depth=fetch_hand_depth,
+                fetch_hand_rgb=fetch_hand_rgb,
+                fetch_head_depth=fetch_head_depth,
+                fetch_head_rgb=fetch_head_rgb,
+                fetch_hand_pose=fetch_hand_pose,
+                fetch_head_pose=fetch_head_pose,
             )
         )
         return (
